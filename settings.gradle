@@ -1,0 +1,4 @@
+include ':library'
+include ':sample'
+
+rootProject.name = 'stackedStickyHeaders-root'
