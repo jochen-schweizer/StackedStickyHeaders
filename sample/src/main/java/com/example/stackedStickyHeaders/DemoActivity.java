@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Pair;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -26,27 +27,32 @@ public class DemoActivity extends Activity {
         setContentView(R.layout.activity_demo);
         stackedStickyHeadersView = (StackedStickyHeadersView) findViewById(R.id.stackedStickyHeadersView);
         stackedStickyHeadersView.setAdapter(new ThreeHeadersAdapter());
-        stackedStickyHeadersView.initStickyHeaders(new int[]{ThreeHeadersAdapter.VIEW_TYPE_YEAR, ThreeHeadersAdapter.VIEW_TYPE_MONTH},
-                new int[]{ThreeHeadersAdapter.ITEM_HEIGHT_DP, ThreeHeadersAdapter.ITEM_HEIGHT_DP});
+        stackedStickyHeadersView.initStickyHeaders(new int[]{ThreeHeadersAdapter.VIEW_TYPE_YEAR, ThreeHeadersAdapter.VIEW_TYPE_MONTH, ThreeHeadersAdapter.VIEW_TYPE_DAY},
+                new int[]{ThreeHeadersAdapter.ITEM_HEIGHT_DP, ThreeHeadersAdapter.ITEM_HEIGHT_DP, ThreeHeadersAdapter.ITEM_HEIGHT_DP});
     }
 
     private class ThreeHeadersAdapter extends BaseAdapter {
-        public static final int VIEW_TYPE_YEAR = 1;
-        public static final int VIEW_TYPE_MONTH = 2;
-        public static final int VIEW_TYPE_DAY = 3;
+        public static final int VIEW_TYPE_YEAR = 0;
+        public static final int VIEW_TYPE_MONTH = 1;
+        public static final int VIEW_TYPE_DAY = 2;
+        public static final int VIEW_TYPE_TIME_OF_DAY = 3;
 
         public final static int ITEM_HEIGHT_DP = 32;
+        public final static int ITEM_HORIZONTAL_PADDING_DP = 16;
         public final int itemHeightPixels;
+        public final int itemHorizontalPaddingPixels;
 
         private final String[] years = new String[]{"2011", "2012", "2013"};
         private final String[] months = new String[]{"January", "February", "March", "April"};
         private final String[] days = new String[]{"01", "02", "03", "04", "05"};
+        private final String[] timeOfDays = new String[]{"morning", "afternoon", "evening", "night"};
 
         private final List<Pair<Integer, String>> data;
 
         public ThreeHeadersAdapter() {
             DisplayMetricsUtils utils = new DisplayMetricsUtils(getResources());
             this.itemHeightPixels = (int) utils.getFloatPixelsFromDps(ThreeHeadersAdapter.ITEM_HEIGHT_DP);
+            this.itemHorizontalPaddingPixels = (int) utils.getFloatPixelsFromDps(ThreeHeadersAdapter.ITEM_HORIZONTAL_PADDING_DP);
             data = new ArrayList<>();
             initData(data);
         }
@@ -68,6 +74,13 @@ public class DemoActivity extends Activity {
         private void initDays(List<Pair<Integer, String>> data) {
             for (String day : days) {
                 data.add(new Pair<>(VIEW_TYPE_DAY, day));
+                initTimeOfDay(data);
+            }
+        }
+
+        private void initTimeOfDay(List<Pair<Integer, String>> data) {
+            for (String timeOfDay : timeOfDays) {
+                data.add(new Pair<>(VIEW_TYPE_TIME_OF_DAY, timeOfDay));
             }
         }
 
@@ -89,10 +102,26 @@ public class DemoActivity extends Activity {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
-                convertView = new TextView(parent.getContext());
-                convertView.setBackgroundColor(Color.WHITE);
-                ((TextView) convertView).setTextColor(Color.DKGRAY);
-                convertView.setLayoutParams(new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, itemHeightPixels));
+                TextView textView = new TextView(parent.getContext());
+                textView.setTextColor(Color.DKGRAY);
+                textView.setPadding(itemHorizontalPaddingPixels, 0, itemHorizontalPaddingPixels, 0);
+                textView.setGravity(Gravity.CENTER_VERTICAL);
+                textView.setLayoutParams(new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, itemHeightPixels));
+                convertView = textView;
+            }
+            switch (getItemViewType(position)) {
+                case VIEW_TYPE_YEAR:
+                    convertView.setBackgroundResource(R.drawable.year_background);
+                    break;
+                case VIEW_TYPE_MONTH:
+                    convertView.setBackgroundResource(R.drawable.month_background);
+                    break;
+                case VIEW_TYPE_DAY:
+                    convertView.setBackgroundResource(R.drawable.day_background);
+                    break;
+                case VIEW_TYPE_TIME_OF_DAY:
+                    convertView.setBackgroundResource(R.drawable.time_of_day_background);
+                    break;
             }
             ((TextView) convertView).setText(data.get(position).second);
             return convertView;
@@ -111,12 +140,12 @@ public class DemoActivity extends Activity {
         @Override
         public boolean isEnabled(int position) {
             // only days are non-sticky and clickable
-            return data.get(position).first == VIEW_TYPE_DAY;
+            return data.get(position).first == VIEW_TYPE_TIME_OF_DAY;
         }
 
         @Override
         public int getViewTypeCount() {
-            return 3;
+            return 4;
         }
 
         @Override
