@@ -75,12 +75,12 @@ public class StackedStickyHeadersView extends FrameLayout {
         addView(headerView, params);
     }
 
-    ListView getListView() {
-        return listView;
-    }
-
     ListAdapter getListAdapter() {
         return listView.getAdapter();
+    }
+
+    public ListView getListView() {
+        return listView;
     }
 
     public void setAdapter(ListAdapter listAdapter) {
