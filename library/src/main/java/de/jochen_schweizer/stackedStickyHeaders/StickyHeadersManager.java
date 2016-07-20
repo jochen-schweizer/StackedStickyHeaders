@@ -1,40 +1,41 @@
 package de.jochen_schweizer.stackedStickyHeaders;
 
 import android.util.Pair;
+import android.util.SparseArray;
+import android.util.SparseIntArray;
 import android.view.View;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-public class StickyHeadersManager {
+class StickyHeadersManager {
     private final StackedStickyHeadersView stackedStickyHeadersView;
     private final DisplayMetricsUtils displayMetricsUtils;
-    private HashMap<Integer, View> headerTypeToHeaderView;
-    private HashMap<Integer, Float> headerTypeToHeaderTopMargin;
-    private HashMap<Integer, Float> headerTypeToHeaderHeight;
-    private HashMap<Integer, Integer> headerTypeToHeaderPosition;
-    private HashMap<Integer, Integer> headerTypeToPreviousHeaderAdapterPosition;
+    private SparseArray<View> headerTypeToHeaderView;
+    private SparseArray<Float> headerTypeToHeaderTopMargin;
+    private SparseArray<Float> headerTypeToHeaderHeight;
+    private SparseIntArray headerTypeToHeaderPosition;
+    private SparseIntArray headerTypeToPreviousHeaderAdapterPosition;
     private int[] headerTypes;
 
-    public StickyHeadersManager(StackedStickyHeadersView stackedStickyHeadersView) {
+    StickyHeadersManager(StackedStickyHeadersView stackedStickyHeadersView) {
         this.stackedStickyHeadersView = stackedStickyHeadersView;
         resetMappings();
         displayMetricsUtils = new DisplayMetricsUtils(stackedStickyHeadersView.getResources());
     }
 
     private void resetMappings() {
-        this.headerTypeToHeaderView = new HashMap<>();
-        this.headerTypeToHeaderTopMargin = new HashMap<>();
-        this.headerTypeToHeaderHeight = new HashMap<>();
-        this.headerTypeToHeaderPosition = new HashMap<>();
-        this.headerTypeToPreviousHeaderAdapterPosition = new HashMap<>();
+        this.headerTypeToHeaderView = new SparseArray<>();
+        this.headerTypeToHeaderTopMargin = new SparseArray<>();
+        this.headerTypeToHeaderHeight = new SparseArray<>();
+        this.headerTypeToHeaderPosition = new SparseIntArray();
+        this.headerTypeToPreviousHeaderAdapterPosition = new SparseIntArray();
         this.headerTypes = new int[0];
     }
 
-    public void initHeaderViews(int[] headersAdapterViewTypes, int[] headerViewsHeights) {
+    void initHeaderViews(int[] headersAdapterViewTypes, int[] headerViewsHeights) {
         // remove all previous sticky views
         stackedStickyHeadersView.removeHeaderViews();
 
@@ -93,7 +94,7 @@ public class StickyHeadersManager {
         });
     }
 
-    public void onScroll(int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+    void onScroll(int firstVisibleItem, int visibleItemCount, int totalItemCount) {
         final ListAdapter listAdapter = stackedStickyHeadersView.getListAdapter();
         final ListView listView = stackedStickyHeadersView.getListView();
 
@@ -118,7 +119,7 @@ public class StickyHeadersManager {
             }
 
             // We can skip views which are not header views
-            if (!headerTypeToHeaderPosition.containsKey(viewType)) {
+            if (headerTypeToHeaderPosition.indexOfKey(viewType) < 0) {
                 continue;
             }
 
@@ -153,7 +154,7 @@ public class StickyHeadersManager {
             final float totalHeight = getLastStickyHeaderDefaultBottom();
 
 
-            if (headerTypeToHeaderPosition.containsKey(itemViewType)) {
+            if (headerTypeToHeaderPosition.indexOfKey(itemViewType) >= 0) {
 
                 int pos = headerTypeToHeaderPosition.get(itemViewType);
 
@@ -173,7 +174,6 @@ public class StickyHeadersManager {
         if (shouldResetHeadersPositions) {
             // Reset the headers positions to the default margins
             resetHeadersToStickyPositions();
-        } else {
         }
     }
 

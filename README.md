@@ -9,11 +9,11 @@ An android library for multiple hierarchically related section headers that stic
 ### Usage
 
 1. Add the StackedStickyHeadersView either to an XML layout file, or programmatically.
-2. Set the list adapter by calling the StackedStickyHeadersView.setAdapter(ListAdapter listAdapter)
-3. Call the initStickyHeaders(int[] headersAdapterViewTypes, int[] headerViewsHeights) to initialize the sticky headers. Make sure the adapter is not empty when you call this method.
-4. Use StackedStickyHeadersView.getListView() to access the internal ListView for setting click listeners for example
+2. Extend a StackedStickyHeadersAdapter and set it as an adapter of the view by calling StackedStickyHeadersView.setAdapter(StackedStickyHeadersAdapter listAdapter)
+3. Make sure to implement the getHeadersViewTypeIds() and getHeadersViewsHeights() methods of the StackedStickyHeadersAdapter
+4. Use StackedStickyHeadersView.getListView() to access the internal ListView for setting click listeners for items
 
 ### Possible future improvements
-- dynamic automatic initialization of sticky headers
+- remove the explicit height of the sticky headers and calculate it dynamically on the go
 - support for RecyclerView
 - click listeners for the sticky headers

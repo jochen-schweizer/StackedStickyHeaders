@@ -83,11 +83,8 @@ public class StackedStickyHeadersView extends FrameLayout {
         return listView;
     }
 
-    public void setAdapter(ListAdapter listAdapter) {
+    public void setAdapter(StackedStickyHeadersAdapter listAdapter) {
         listView.setAdapter(listAdapter);
-    }
-
-    public void initStickyHeaders(int[] headersAdapterViewTypes, int[] headerViewsHeights) {
-        stickyHeadersManager.initHeaderViews(headersAdapterViewTypes, headerViewsHeights);
+        stickyHeadersManager.initHeaderViews(listAdapter.getHeadersViewTypeIds(), listAdapter.getHeadersViewsHeights());
     }
 }
